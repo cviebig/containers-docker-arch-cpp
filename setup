@@ -1,0 +1,28 @@
+#!/bin/bash
+
+this_dir=$(pwd)/$(dirname ${BASH_SOURCE[0]})
+source ${this_dir}/env.sh
+
+if [[ $1 == "--no-cache" ]]; then
+    additional_options="--no-cache"
+else
+    aditional_options=""
+fi
+
+function build_image {
+    image_dir="${this_dir}/${1}"
+    base_image=${2:+--build-arg=BASE_IMAGE=${PROJECT_NAME}/${2}}
+    revision_tag="-t ${PROJECT_NAME}/${1}:$(git rev-parse --short HEAD)"
+    latest_tag="-t ${PROJECT_NAME}/${1}:latest"
+    set -x
+    cd ${image_dir}
+    docker build ${base_image} ${revision_tag} ${latest_tag} ${additional_options} .
+    cd -
+    { set +x; } 2>/dev/null
+}
+
+dir=$(pwd)
+build_image "base"
+build_image "development" "base"
+build_image "runtime" "base"
+cd $dir

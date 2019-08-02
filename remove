@@ -1,0 +1,12 @@
+#!/bin/bash
+
+this_dir=$(pwd)/$(dirname ${BASH_SOURCE[0]})
+source ${this_dir}/env.sh
+
+set +e
+set +x
+
+docker ps     | grep "${PROJECT_NAME}/" | grep 'Up ' | awk '{print $1}' | xargs -r docker stop
+docker ps -a  | grep "${PROJECT_NAME}/" | awk 'FNR > 1 {print $1}' | xargs -r docker rm -f
+docker images | grep "${PROJECT_NAME}/" | grep -v latest | awk '{print $3}' | xargs -r docker rmi -f
+docker rmi base/archlinux

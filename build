@@ -1,0 +1,14 @@
+#!/bin/bash
+
+this_dir=$(pwd)/$(dirname ${BASH_SOURCE[0]})
+source ${this_dir}/env.sh
+source ${this_dir}/dir.sh
+
+cmd="cd build && ninja ${@}"
+
+docker run --rm -t -i \
+       -v ${BUILD_DIR}:/home/user/build \
+       -v ${this_dir}/..:/home/user/project \
+       -v ${OUTPUT_DIR}:/tmp \
+       projsql/development \
+       sh -c "${cmd}"

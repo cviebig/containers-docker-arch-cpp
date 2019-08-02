@@ -1,0 +1,14 @@
+#!/bin/bash
+
+this_dir=$(pwd)/$(dirname ${BASH_SOURCE[0]})
+source ${this_dir}/env.sh
+source ${this_dir}/dir.sh
+
+cmd="cd build && export CC=${CC} && export CXX=${CXX} && cmake -GNinja -DCMAKE_BUILD_TYPE=${1:-Release} ../project"
+
+docker run --rm -t -i \
+       -v ${BUILD_DIR}:/home/user/build \
+       -v ${this_dir}/..:/home/user/project \
+       -v ${OUTPUT_DIR}:/tmp \
+       ${PROJECT_NAME}/development \
+       sh -c "${cmd}"

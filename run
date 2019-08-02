@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ -z ${1+x} ]; then
+    echo "Give image name as first argument"
+    exit 1
+fi
+
+this_dir=$(pwd)/$(dirname ${BASH_SOURCE[0]})
+source ${this_dir}/env.sh
+source ${this_dir}/dir.sh
+
+docker run -t -i \
+       --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
+       -v ${BUILD_DIR}:/home/user/build \
+       -v ${this_dir}/..:/home/user/project \
+       -v ${OUTPUT_DIR}:/tmp \
+       ${PROJECT_NAME}/${1}:${2:-latest} \
+       ${3:-bash} \
+       "${@:4}"
